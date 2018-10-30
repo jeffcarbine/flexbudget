@@ -1,0 +1,42 @@
+<!-- views/login.ejs -->
+<!doctype html>
+<html>
+   <head>
+      <title>OurMusicHub - Login</title>
+      <% include ../../shared/head %>
+   </head>
+   <body>
+      <header>
+         <% include ../../shared/header %>
+      </header>
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-sm-6">
+            <div class="title">
+               <h1>Login</h1>
+               <p>Don't have an account yet? <a href="/signup">Sign up now!</a></p>
+            </div>
+            <!-- show any messages that come back with authentication -->
+            <% if (message.length > 0) { %>
+            <div class="alert alert-warning"><%= message %></div>
+            <% } %>
+            <!-- LOGIN FORM -->
+            <form action="/login" method="post">
+               <div class="form-group">
+                  <label>Email Address</label>
+                  <input type="email" class="form-control" name="email" required>
+               </div>
+               <div class="form-group">
+                  <label>Password</label>
+                  <input type="password" class="form-control" name="password" required>
+               </div>
+               <button type="submit" class="btn btn-primary">Login</button>
+            </form>
+          </div>
+        </div>
+      </div>
+      <footer>
+         <% include ../../shared/footer %>
+      </footer>
+   </body>
+</html>

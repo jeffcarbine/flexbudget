@@ -1,0 +1,35 @@
+<!-- views/signup.ejs -->
+<!doctype html>
+<html>
+   <head>
+      <title>Create User Account</title>
+      <% include ../../shared/head %>
+  </head>
+   <body>
+      <header>
+        <% include ../../shared/header %>
+      </header>
+      <div class="container">
+         <div class="row justify-content-center">
+           <div class="col-sm-6 col-sm-offset-2">
+              <h2>Reset Password</h2>
+              <p>Okay, you're good to reset your password now.<br/>Try not to forget it next time, yeah?</p>
+              <form method="post">
+                 <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" class="form-control" name="password" required>
+                 </div>
+                 <div class="form-group">
+                    <label>Confirm Password</label>
+                    <input type="password" class="form-control" name="confirm" required>
+                 </div>
+                 <button type="submit" class="btn btn-primary"> Reset your password</button>
+              </form>
+           </div>
+         </div>
+      </div>
+      <footer>
+         <% include ../../shared/footer %>
+      </footer>
+   </body>
+</html>

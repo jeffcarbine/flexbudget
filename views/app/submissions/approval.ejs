@@ -1,0 +1,95 @@
+<!doctype html>
+<html>
+<head>
+    <title>GMR</title>
+    <% include ../../shared/head %>
+    <script>
+      // PAGE SPECIFIC FUNCTIONS
+      $(document).ready(function() {
+        $('.addAlbumToggle').click(function() {
+          $("#addAlbum").toggleClass("visible");
+        });
+
+        $(".deleteAlbumToggle, .deleteAlbumNo").click(function() {
+          var albumIdentifier = $(this).attr("data-albumid");
+          console.log(albumIdentifier);
+          $("#delete" + albumIdentifier + " .deleteAlbumStepOne, "+ " #delete" +  albumIdentifier + " .deleteAlbumStepTwo").toggleClass("hidden");
+        });
+
+        var country = $("#countries").val().replace(" ","_");
+        $(".states#for" + country).show().children().children("select").attr("name","state");
+
+        $("#countries").change(function() {
+          console.log("changed countries!");
+          var newCountry = $(this).val().replace(" ","_");
+          $(".states").hide().children().children("select").attr("name","state-null");
+          $(".states#for" + newCountry).show().children().children("select").attr("name","state");
+        });
+      });
+    </script>
+</head>
+<body>
+    <header>
+        <% include ../../shared/header %>
+     </header>
+<div class="container">
+
+    <div class="page-header text-center">
+        <h1>Album Approval</h1>
+        <p>Please review the submitted albums and tracks. If the music does not meet OurMusicHub standards, please contact the owner via phone or email to either resolve the quality issue, or to explain that their music has been rejected.</p>
+    </div>
+
+  <div class="albumSection">
+    <h2>Albums</h2>
+    <% if(albums.length > 0) { %>
+      <% for(i = 0; i<albums.length; i++) { %>
+        <div class="row album">
+          <div class="col-sm-5">
+            <strong>Album Info</strong>
+            <ul class="albumInfo">
+            <li><%- albums[i].artistType %> Name: <strong><%- albums[i].artistName %></strong></li>
+            <li><%- albums[i].type %> Name: <strong><%- albums[i].name %></strong></li>
+            <li>Released: <strong><%- albums[i].year %></strong></li>
+            <li>Genre: <strong><%- albums[i].genre %></strong></li>
+            <li>Subgenre: <strong><%- albums[i].subgenre %></strong></li>
+            <li>Language: <strong><%- albums[i].language %></strong></li>
+            <li>Country: <strong><%- albums[i].country.replace("_"," ") %></strong></li>
+            <li>State/Province: <strong><%- albums[i].state %></strong></li>
+          </ul>
+          </div>
+          <div class="col-sm-7">
+            <strong>Tracks</strong>
+            <ul class="albumTracks">
+              <% for(var y=0;y<albums[i].tracks.length;y++) { %>
+                <li>
+                    <span class="songTitle"><%- albums[i].tracks[y].title %></span><br/>
+                    <audio controls>
+                        <source src="/playTrack?<%- albums[i].tracks[y]._id %>" type="audio/mpeg">
+                    </audio>
+                </li>
+              <% } %>
+            </ul>
+          </div>
+          <div class="col-sm-6">
+            <form method="POST" action="/approveAlbum">
+              <input type="hidden" name="submissionId" value="<%- albums[i]._id %>">
+              <button class="btn btn-primary" id="approveAlbum" type="submit">Approve album</button>
+              </form>
+          </div>
+          <div class="col-sm-6">
+              <form method="POST" action="/rejectAlbum">
+                <input type="hidden" name="submissionId" value="<%- albums[i]._id %>">
+                <button class="btn btn-warning" id="rejectAlbum" type="submit">Reject album</button>
+                </form>
+            </div>
+        </div>
+      <% } %>
+    <% } else { %>
+      <p>All current submissions have been either approved or rejected.</p>
+    <% } %>
+  </div>
+  <footer>
+      <% include ../../shared/footer %>
+    </footer>
+  </body>
+  </html>

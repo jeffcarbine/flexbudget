@@ -1,0 +1,37 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>The HTML5 Herald</title>
+  <meta name="description" content="The HTML5 Herald">
+  <meta name="author" content="SitePoint">
+
+</head>
+
+<body>
+
+  <h1>Scam Spammer</h1>
+
+  <div id="form">
+    <input id="suffix" type="text" placeholder="optional" />
+    <input type="number" id="count" required value="1000" />
+    <button onclick="scamSpammer()">Spam the scammer!</button>
+  </div>
+
+  <div id="count">
+    <h2></h2>
+  </div>
+
+  <div id="console">
+
+  </div>
+
+  <script
+  src="https://code.jquery.com/jquery-3.3.1.min.js"
+  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+  crossorigin="anonymous"></script>
+  <script src="scam.js"></script>
+</body>
+</html>

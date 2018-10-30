@@ -1,0 +1,305 @@
+<!doctype html>
+<html>
+<head>
+    <title>GMR</title>
+    <% include ../../shared/head %>
+    <script>
+      // PAGE SPECIFIC FUNCTIONS
+      $(document).ready(function() {
+        $('.addAlbumToggle').click(function() {
+          $("#addAlbum").toggleClass("visible");
+        });
+
+        $(".deleteAlbumToggle, .deleteAlbumNo").click(function() {
+          var albumIdentifier = $(this).attr("data-albumid");
+          console.log(albumIdentifier);
+          $("#delete" + albumIdentifier + " .deleteAlbumStepOne, "+ " #delete" +  albumIdentifier + " .deleteAlbumStepTwo").toggleClass("hidden");
+        });
+
+        var country = $("#countries").val().replace(" ","_");
+        $(".states#for" + country).show().children().children("select").attr("name","state");
+
+        $("#countries").change(function() {
+          console.log("changed countries!");
+          var newCountry = $(this).val().replace(" ","_");
+          $(".states").hide().children().children("select").attr("name","state-null");
+          $(".states#for" + newCountry).show().children().children("select").attr("name","state");
+        });
+      });
+    </script>
+</head>
+<body>
+  <header>
+     <% include ../../shared/header %>
+  </header>
+  <div class="container">
+  <div class="title">
+    <h2>Music Submission</h2>
+    <p>Here you can add submit new music to OurMusicHub. Once submitted, you can modify or remove your submission until it is either approved or rejected.</p>
+    <p>If it is rejected, we will contact you with further info as to how you can get your music approved.</p>
+    <p>You may also remove all previously submitted music - but removals are final and cannot be undone. You will have to re-submit your tracks for approval if you want to restore them.</p>
+    <div class="addAlbumToggleContainer">
+      <button id="openAddAlbum" class="addAlbumToggle" aria-label="Add new album">
+        <span class="circle"><i class="fas fa-plus"></i></span> <span class="text">Add a new album</span>
+      </span>
+    </div>
+  </div>
+  <div class="submissions">
+    <h3>Submitted Albums</h3>
+    <p>All these albums are currently pending approval before they go live. You can still modify their information.</p>
+    <% if(submissions.length > 0) { %>
+      <% for(var i = 0; i<submissions.length; i++) { %>
+        <div class="row album">
+          <div class="col-sm-12">
+            <h4><%= submissions[i].name %> / <%= submissions[i].artistName %></h4>
+          </div>
+            <div class="col-sm-4">
+              <strong>Info</strong>
+              <hr/>
+              <form method="POST" action="/updateAlbum">
+                <input type="hidden" name="id" value="<%- submissions[i]._id %>">
+                <div class="form-group">
+                  <select id="artistType" class="form-control" name="artistType">
+                    <%
+                      var artistTypes = [ "Band", "Solo Artist" ];
+                      for ( var a = 0; a < artistTypes.length; a++ )
+                      {
+                          var selected = ( submissions[i].artistType == artistTypes[a] ) ? "selected" : "";
+                          %><option value="<%=artistTypes[ a ] %>" <%=selected %>><%=artistTypes[ a ] %></option><%
+                      }
+                    %>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <input class="form-control" type="text" name="artistName" placeholder="Artist Name" value="<%- submissions[i].artistName %>">
+                </div>
+                <div class="form-group">
+                  <select id="albumType" class="form-control" name="albumType">
+                    <%
+                      var albumTypes = [ "LP", "EP", "Single" ];
+                      for ( var a = 0; a < albumTypes.length; a++ )
+                      {
+                          var selected = ( submissions[i].type == albumTypes[a] ) ? "selected" : "";
+                          %><option value="<%=albumTypes[ a ] %>" <%=selected %>><%=albumTypes[ a ] %></option><%
+                      }
+                    %>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <input class="form-control" type="text" name="albumName" placeholder="Album Name" value="<%- submissions[i].name %>">
+                </div>
+                <div class="form-group">
+                  <input class="form-control" type="text" name="year" placeholder="Year" value="<%- submissions[i].year %>">
+                </div>
+                <div class="form-group">
+                  <input class="form-control" type="text" name="genre" placeholder="Genre" value="<%- submissions[i].genre %>">
+                </div>
+                <div class="form-group">
+                  <input class="form-control" type="text" name="subgenre" placeholder="Subgenre" value="<%- submissions[i].subgenre %>">
+                </div>
+                <div class="form-group">
+                  <select class="form-control" name="language">
+                    <% include partials/languages %>
+                  </select>
+                </div>
+                <% include partials/countries %>
+                <button type="submit" class="btn btn-primary btn-sm">Update Album Info</button>
+              </form>
+            </div>
+            <div class="col-sm-4">
+              <strong>Tracks</strong>
+              <hr/>
+              <% for(var y=0;y<submissions[i].tracks.length;y++) { %>
+                <form method="post" action="/updateTrack" enctype="multipart/form-data">
+                  <input type="hidden" value="<%- user.local.email -%>" name="userEmail" />
+                  <input type="hidden" name="trackID" value="<%- submissions[i].tracks[y]._id %>">
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text" id="basic-addon1"><%= (y+1) %></span>
+                    </div>
+                    <input class="form-control" type="text" name="trackName" value="<%- submissions[i].tracks[y].title %>">
+                  </div>
+                  <div class="form-group">
+                    <label>Timing
+                      <select class="form-control" name="timing">
+                        <%
+                          var timings = [ "Conventional", "Non-Conventional" ];
+                          for ( var a = 0; a < timings.length; a++ )
+                          {
+                              var selected = ( submissions[i].timing == timings[a] ) ? "selected" : "";
+                              %><option value="<%=timings[ a ] %>" <%=selected %>><%=timings[ a ] %></option><%
+                          }
+                        %>
+                      </select>
+                    </label>
+                  </div>
+                  <div class="form-group">
+                    <label>
+                      <% var checked = ( submissions[i].tracks[y].download == "allow" ) ? "checked" : ""; %>
+                      <input type="checkbox" name="download" <%=checked %> value="allow">
+                      Allow for download <span class="tooltip">What's this?</span>
+                    </label>
+                  </div>
+                  <div class="form-group">
+                    <input type="file" name="audioFile" style="margin-top: .5rem;">
+                  </div>
+                  <button class="btn btn-sm btn-primary">Update Track</button>
+                </form>
+                <form method="post" action="/deleteTrack" style="display: none;">
+                  <input type="hidden" name="trackID" value="<%- submissions[i].tracks[y]._id %>">
+                  <input type="hidden" name="albumID" value="<%- submissions[i]._id %>">
+                  <input type="hidden" name="albumName" value="<%- submissions[i].name %>">
+                  <input type="hidden" name="trackName" value="<%- (submissions[i].tracks[y].title).replace(/ /g,"_") %>">
+                  <button class="btn btn-sm btn-danger"><span class="glyphicon glyphicon-remove"></span> Delete Track</button>
+                </form>
+                <hr/>
+              <% } %>
+            </div>
+            <div class="col-sm-4">
+              <strong>Add Track</strong>
+              <hr/>
+              <form method="POST" action="/addTrack" enctype="multipart/form-data">
+                <input type="hidden" name="id" value="<%- submissions[i]._id %>">
+                <div class="form-group">
+                  <input class="form-control" type="text" name="trackName" placeholder="Track Name" required>
+                </div>
+                <div class="form-group">
+                  <label>Timing
+                    <select class="form-control" name="timing">
+                      <%
+                        var timings = [ "Conventional", "Non-Conventional" ];
+                        for ( var a = 0; a < timings.length; a++ )
+                        {
+                            var selected = ( submissions[i].timing == timings[a] ) ? "selected" : "";
+                            %><option value="<%=timings[ a ] %>" <%=selected %>><%=timings[ a ] %></option><%
+                        }
+                      %>
+                    </select>
+                  </label>
+                </div>
+                <div class="form-group">
+                  <label>
+                    <input type="checkbox" name="download" value="allow">
+                    Allow for download <span class="tooltip">What's this?</span>
+                  </label>
+                </div>
+                <div class="form-group">
+                  <input type="file" name="audioFile" required>
+                </div>
+                <button class='btn btn-primary btn-sm'>Add Track</button>
+              </form>
+            </div>
+            <div class="col-sm-12">
+              <div class="deleteAlbum" id="delete<%- submissions[i]._id %>">
+                <div class="deleteAlbumStepOne">
+                  <button class="btn btn-warning btn-lg deleteAlbumToggle" data-albumid="<%- submissions[i]._id %>">Delete album</button>
+                </div>
+                <div class="deleteAlbumStepTwo hidden">
+                  <p>Are you sure? This will delete the album and all of the corresponding tracks. This <strong>cannot</strong> be undone.<br/>Are you you sure you want to delete everything?</p>
+                  <button class="btn btn-info btn-lg deleteAlbumNo" data-albumid="<%- submissions[i]._id %>" style="margin-bottom: .5rem;">Wait no, don't delete everything</button>
+                  <form method="POST" action="/deleteAlbum">
+                    <input type="hidden" value="<%- submissions[i]._id %>" name="albumID">
+                    <button class="btn btn-danger btn-lg" id="deleteAlbumYes" type="submit">Yes, delete everything please</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+        </div>
+      <% } %>
+    <% } else { %>
+      <p>You haven't created any albums yet. Create an album to start uploading tracks!</p>
+    <% } %>
+  </div>
+  <div class="approvals">
+    <h3>Approved Music</h3>
+    <p>It looks like none of your music has been approved yet. Don't worry - we'll get on it quickly and have you up and running in no time!</p>
+  </div>
+
+  <div id="addAlbum">
+    <div id="addModal" class="uploadSection">
+      <button id="closeAddAlbum" class="addAlbumToggle" aria-label="Close">
+        <i class="fas fa-times"></i>
+      </button>
+      <div>
+        <h2>Album Information</h2>
+        <p>Please fill out all of the information about your album - all the info you provide will help users to better find your music!</p>
+        <form method="POST" action="/addAlbum">
+          <input type="hidden" value="<%- user.local.email -%>" name="userEmail" />
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Artist Type
+                  <select class="form-control" name="artistType">
+                    <%
+                      var artistTypes = [ "Band", "Solo Artist" ];
+                      for ( var a = 0; a < artistTypes.length; a++ )
+                      {
+                          %><option value="<%=artistTypes[ a ] %>"><%=artistTypes[ a ] %></option><%
+                      }
+                    %>
+                  </select>
+                </label>
+              </div>
+              <div class="form-group">
+                <label>Artist Name
+                  <input type="text" name="artistName" class="form-control" placeholder="Artist" required>
+                </label>
+              </div>
+              <div class="form-group">
+                <label>Album Type
+                  <select class="form-control" name="albumType">
+                    <%
+                      var albumTypes = [ "LP", "EP", "Single" ];
+                      for ( var a = 0; a < albumTypes.length; a++ )
+                      {
+                          %><option value="<%=albumTypes[ a ] %>"><%=albumTypes[ a ] %></option><%
+                      }
+                    %>
+                  </select>
+                </label>
+              </div>
+              <div class="form-group">
+                <label>Album Name
+                  <input type="text" name="albumName" class="form-control" placeholder="Album Name" required>
+                </label>
+              </div>
+              <div class="form-group">
+                <label>Genre
+                  <input type="text" name="genre" class="form-control" placeholder="Genre" required>
+                </label>
+              </div>
+              <div class="form-group">
+                <label>Subgenre (if any)
+                  <input type="text" name="subgenre" class="form-control" placeholder="Optional">
+                </label>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-group">
+                <label>Year of Release
+                  <input type="text" name="year" class="form-control" placeholder="Year" required>
+                </label>
+              </div>
+              <div class="form-group">
+                <label>Language
+                  <select class="form-control" name="language">
+                    <% include partials/languages %>
+                  </select>
+                </label>
+              </div>
+              <% include partials/countries %>
+            </div>
+          </div>
+          <div class="btn-center">
+            <button type="submit" class="btn btn-primary btn-lg">Create album and start uploading</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+  <footer>
+    <% include ../../shared/footer %>
+  </footer>
+</body>
+</html>

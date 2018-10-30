@@ -1,0 +1,11 @@
+<%
+  var languages = [ "English","Spanish","Chinese","French","Portuguese","German","Korean","German","Italian","Japanese","Greek","Dutch","Hindi","Arabic","Russian","Czech","Polish","Bengali","Indonesian","Turkish","Vietnamese","Thai","Ukrainian","Urdu","Swahili","Punjabi","Telugu","Tamil","Marathi","Iranian Persian","Gujarati","Kannada","Filipin","Burmese","Hausa","Bhojpuri","Malayalam","Sunda","Maithili","Odia","Nigerian Pidgin","Punjabi","Zulu","Amharic","Tagalog","Uzbek","Sindhi","Romanian","Pashto","Yoruba","Saraiki","Xhosa","Malay","Igb","Afrikaans","Sinhala","Cebuan","Nepali","Rangpuri","Central Khmer","Kurdish","Azerbaijani","Somali","Bamanankan","Bavarian","Magahi","Northern Soth","Southern Sotho","Chhattisgarhi","Tswana","Chittagonian","Assamese","Deccan","Kazakh","Hungarian","Shona","Jula","Swedish","Sylheti","Nigerian Fulfulde","Kinyarwanda" ];
+
+  for ( var a = 0; a < languages.length; a++ )
+  {
+      if(typeof albums[i] !== "undefined") {
+        var selected = ( albums[i].language == languages[a] ) ? "selected" : "";
+      }
+      %><option value="<%=languages[ a ] %>" <%=selected %>><%=languages[ a ] %></option><%
+  }
+%>

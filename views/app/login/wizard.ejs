@@ -1,0 +1,55 @@
+<!-- views/signup.ejs -->
+<!doctype html>
+<html>
+   <head>
+      <title>Create User Account</title>
+      <% include ../../shared/head %>
+      <script src='https://www.google.com/recaptcha/api.js'></script>
+  </head>
+   <body>
+      <header>
+          <% include ../../shared/header %>
+      </header>
+      <div class="container">
+        <div class="row justify-content-center">
+           <div class="col-sm-6">
+             <div class="title">
+               <h2>Sign Up</h2>
+               <p>With an OurMusicHub account, you can...</p>
+               <ul>
+                 <li>download music from artists all over the globe</li>
+                 <li>submit your own music for streaming online</li>
+                 <li>share and transfer cryptocurrencies</li>
+               </ul>
+             </div>
+              <!-- show any messages that come back with authentication -->
+              <% if (message.length > 0) { %>
+              <div class="alert alert-warning"><%= message %></div>
+              <% } %>
+              <form action="/signup" method="post">
+                <h2>Let's get you set up</h2>
+                  <div class="wizard-step step1">
+
+                  </div>
+                  <div class="wizard-step step2">
+
+                  </div>
+                  <div class="wizard-step step3">
+
+                  </div>
+                  <div class="wizard-step step4">
+
+                  </div>
+                 <div class="form-subtext">
+                   <small>*Indicates a required field</small>
+                 </div>
+                 <button type="submit" class="btn btn-primary"><span class="fa fa-plus-circle"></span> Create an account</button>
+              </form>
+           </div>
+        </div>
+      </div>
+      <footer>
+         <% include ../../shared/footer %>
+      </footer>
+   </body>
+</html>

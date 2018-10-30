@@ -7,6 +7,15 @@ var statcSchema = mongoose.Schema({
             name        : String,
             balance     : Number,
             rate        : Number,
+            type        : String
+        }
+    ],
+    creditCards               : [
+        {
+            name        : String,
+            balance     : Number,
+            limit       : Number,
+            rate        : Number,
         }
     ],
     debts               : [
@@ -21,7 +30,7 @@ var statcSchema = mongoose.Schema({
             name        : String,
             amount      : Number,
             frequency   : String,
-            months      : Array
+            dates       : Array
 
         }
     ],

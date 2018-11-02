@@ -4,8 +4,8 @@ var fs = require('fs');
 var multer = require('multer');
 var mongoose = require('mongoose');
 var User = require('./models/user');
-var Album = require('./models/album-approved');
-var Submission = require('./models/album-submission');
+var Static = require('./models/static');
+var Variables = require('./models/variables');
 var rmdir = require('rimraf');
 var mkdirp = require('mkdirp');
 var nodemailer = require("nodemailer");
@@ -78,12 +78,7 @@ module.exports = function(app, passport) {
         });
     });
 
-    // DONATIONS
-    app.get('/donate', function(req, res) {
-        res.render('website/donate.ejs', {
-          user : req.user,
-        });
-    });
+
 
     // LOG IN
     app.get('/login', function(req, res) {
@@ -123,7 +118,7 @@ module.exports = function(app, passport) {
       });
 
     app.post('/signup', recaptcha.middleware.verify, captchaVerification, passport.authenticate('local-signup', {
-        successRedirect : '/login', // redirect to the secure profile section
+        successRedirect : '/initialize', // redirect to the secure profile section
         failureRedirect : '/signup', // redirect back to the signup page if there is an error
         failureFlash : true // allow flash messages
     }));
@@ -267,25 +262,88 @@ module.exports = function(app, passport) {
     });
 
 
-
-    // SUBMISSIONS PAGE
-    app.get('/submissions', isLoggedIn, function(req, res, next) {
-      if(req.user.administrator == true) {
-        res.redirect("/submissions/approval");
+    // INITIALIZATION WIZARD
+    app.get("/initialize", isLoggedIn, function(req, res, next) {
+      // if user is already initialized, send them to the dashboard
+      if(req.user.initialized) {
+        res.redirect("/dashboard");
       } else {
-        Promise.all([
-          Submission.find({'owner':req.user.local.email}).exec(),
-          Album.find({'owner':req.user.local.email}).exec(),
-        ]).then(function(data) {
-          var submissions = data[0];
-          var albums = data[1];
-          res.render('app/submissions/index.ejs', {
-              submissions: submissions,
-              albums: albums,
-              user : req.user
-          });
+        res.render("app/wizard/index.ejs", {
+          user: req.user
         });
       }
+    });
+
+
+    // SUBMIT INITIALIZATION wizard
+    app.post("/submit/static", isLoggedIn, function(req, res, next) {
+      req.newMongoId = mongoose.Types.ObjectId();
+      next();
+    },
+    function(req, res, next) {
+      // create static instance for user
+      var newStatic = new Static({
+        userId: req.body.userId
+        accounts: [],
+        creditCards: [],
+        debts: [],
+        income: [],
+        transfers: []
+      });
+      newStatic.save(function(err, doc){
+        if(err) {
+          return next(err);
+        } else {
+          //res.redirect('/dashboard'); // refresh the page
+          return next();
+        }
+      });
+    },
+    function(req, res, next) {
+      // for each account passed
+
+      // save accounts
+      Static.findOneAndUpdate({
+        userId: req.body.userId,
+      },{
+        $push: { // push another track entry onto the tracks array
+          accounts:
+            {
+              _id: req.newMongoId,
+              title: req.body.trackName,
+              timing: req.body.timing,
+              download: req.body.download,
+            }
+        }
+      },{
+        new: true
+      })
+      .exec(function(err, doc){
+        if(err) {
+          return next(err);
+        } else {
+          res.redirect('/submissions');
+        }
+      });
+    }
+  );
+
+
+
+    // DASHBOARD
+    app.get('/dashboard', isLoggedIn, function(req, res, next) {
+      Promise.all([
+        Submission.find({'owner':req.user.local.email}).exec(),
+        Album.find({'owner':req.user.local.email}).exec(),
+      ]).then(function(data) {
+        var submissions = data[0];
+        var albums = data[1];
+        res.render('app/submissions/index.ejs', {
+            submissions: submissions,
+            albums: albums,
+            user : req.user
+        });
+      });
     });
 
 

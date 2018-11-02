@@ -13,37 +13,50 @@
       <div class="container">
         <div class="row justify-content-center">
            <div class="col-sm-6">
-             <div class="title">
-               <h2>Sign Up</h2>
-               <p>With an OurMusicHub account, you can...</p>
-               <ul>
-                 <li>download music from artists all over the globe</li>
-                 <li>submit your own music for streaming online</li>
-                 <li>share and transfer cryptocurrencies</li>
-               </ul>
-             </div>
-              <!-- show any messages that come back with authentication -->
-              <% if (message.length > 0) { %>
-              <div class="alert alert-warning"><%= message %></div>
-              <% } %>
               <form action="/signup" method="post">
                 <h2>Let's get you set up</h2>
                   <div class="wizard-step step1">
-
+                    <h3>Tell us about your bank accounts</h3>
+                    <p>Add all the bank accounts you want considered in your budget. Make sure to get the current available balance for each account.</p>
+                    <div class="form-additions">
+                      <div class="form-group">
+                        <label>Account Name
+                          <input name="account-name1" type="text" placeholder="Call it whatever you like">
+                        </label>
+                      </div>
+                      <div class="form-group">
+                        <label>Account Type
+                          <select name="account-type1">
+                            <option>Checking</option>
+                            <option>Savings</option>
+                            <option>IRA</option>
+                            <option>CD</option>
+                          </select>
+                        </label>
+                      </div>
+                      <div class="form-group">
+                        <label>Available Balance
+                          <input name="account-balance1" type="text">
+                        </label>
+                      </div>
+                      <div class="form-group">
+                        <label>
+                          <input name="primary-account" value="account1" type="radio"> This is my primary account
+                        </label>
+                      </div>
+                      <span class="btn add-more">Add Another</span>
+                    </div>
+                    <span class="btn action">Next</span>
                   </div>
                   <div class="wizard-step step2">
-
+                    <span class="btn action">Next</span>
                   </div>
                   <div class="wizard-step step3">
-
+                    <span class="btn action">Next</span>
                   </div>
                   <div class="wizard-step step4">
-
+                    <button type="submit" class="btn">Let's get started!</button>
                   </div>
-                 <div class="form-subtext">
-                   <small>*Indicates a required field</small>
-                 </div>
-                 <button type="submit" class="btn btn-primary"><span class="fa fa-plus-circle"></span> Create an account</button>
               </form>
            </div>
         </div>

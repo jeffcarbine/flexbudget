@@ -1,7 +1,8 @@
 var mongoose = require('mongoose');
 
 // define the schema for our user model
-var statcSchema = mongoose.Schema({
+var staticSchema = mongoose.Schema({
+    userid              : String,
     accounts            : [
         {
             name        : String,

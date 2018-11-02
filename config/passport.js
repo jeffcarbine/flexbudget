@@ -60,31 +60,13 @@ module.exports = function(passport) {
                 // create the user
                 var newUser            = new User();
 
-                // set use as admin if they are the
-                // first user to sign up, otherwise,
-                // set it to false
-                // change admin status:  db.users.updateOne({"_id" : ObjectId("OBJECTIDGOESHERE")},{$set: {"administrator" : true}})
-                // check to see if this is the first user being created
-                // so they can be the admin
-                var setAdmin = false;
-                User.findOne({ "administrator" :  true }, function(err, user) {
-                    if (user) {
-                        setAdmin = true;
-                    }
-                })
-
-                if(setAdmin) {
-                    newUser.administrator = true;
-                } else {
-                    newUser.administrator = false;
-                }
-
                 // set the user's local credentials
                 newUser.local.email    = email;
                 newUser.local.firstName= req.body.firstName;
                 newUser.local.lastName = req.body.lastName;
                 newUser.local.phone    = req.body.phone;
                 newUser.local.password = newUser.generateHash(password);
+                newUser.initialized    = false;
 
                 // save the user
                 newUser.save(function(err) {

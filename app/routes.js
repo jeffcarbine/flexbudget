@@ -281,14 +281,10 @@ module.exports = function(app, passport) {
       next();
     },
     function(req, res, next) {
+      console.log(req.body);
       // create static instance for user
       var newStatic = new Static({
         userId: req.body.userId
-        accounts: [],
-        creditCards: [],
-        debts: [],
-        income: [],
-        transfers: []
       });
       newStatic.save(function(err, doc){
         if(err) {
@@ -300,47 +296,69 @@ module.exports = function(app, passport) {
       });
     },
     function(req, res, next) {
-      // for each account passed
+      // handle the variable req.body data
+      var arr = Object.keys(req.body);
+      console.log("arr is:");
+      console.log(arr);
+      var accounts = [];
+      var creditCards = [];
+      var debts = [];
+      var income = [];
+      var transfers = [];
 
-      // save accounts
-      Static.findOneAndUpdate({
-        userId: req.body.userId,
-      },{
-        $push: { // push another track entry onto the tracks array
-          accounts:
-            {
-              _id: req.newMongoId,
-              title: req.body.trackName,
-              timing: req.body.timing,
-              download: req.body.download,
-            }
-        }
-      },{
-        new: true
-      })
-      .exec(function(err, doc){
-        if(err) {
-          return next(err);
-        } else {
-          res.redirect('/submissions');
-        }
-      });
-    }
-  );
+
+      for(var i = 0; i < arr.length; i++) {
+      	if (arr[i].includes("account")) {
+          console.log("'account' detected!");
+      		accounts.push(req.body[arr[i]]);
+      	} else if (arr[i].includes("creditCard")) {
+      		creditCards.push(req.body[arr[i]]);
+      	} else if (arr[i].includes("debt")) {
+      		debts.push(req.body[arr[i]]);
+      	} else if (arr[i].includes("income")) {
+      		income.push(req.body[arr[i]]);
+      	} else if (arr[i].includes("transfer")) {
+      		transfers.push(req.body[arr[i]]);
+      	}
+      }
+
+      Static
+      	.findOneAndUpdate({
+      		userId: req.body.userId
+      	},{
+      		$set: {
+      			accounts: accounts,
+      			creditCards: creditCards,
+      			debts: debts,
+      			income: income,
+      			transfers: transfers
+      		}
+        },{
+          new: true
+        })
+        .exec(function(err, doc){
+          if(err) {
+            return next(err);
+          } else {
+            res.redirect('/initialize');
+          }
+        });
+      }
+    );
 
 
 
     // DASHBOARD
     app.get('/dashboard', isLoggedIn, function(req, res, next) {
       Promise.all([
-        Submission.find({'owner':req.user.local.email}).exec(),
-        Album.find({'owner':req.user.local.email}).exec(),
+        Static.find({'userId':req.user._id}).exec(),
+        Variables.find({'userId':req.user._id}).exec(),
       ]).then(function(data) {
-        var submissions = data[0];
-        var albums = data[1];
-        res.render('app/submissions/index.ejs', {
-            submissions: submissions,
-            albums: albums,
+        var static = data[0];
+        var variables = data[1];
+        res.render('app/dashboard/index.ejs', {
+            static: static,
+            variables: variables,
             user : req.user
         });
       });
